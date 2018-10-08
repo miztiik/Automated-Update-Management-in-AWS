@@ -1,4 +1,4 @@
-# AWS Systems Manager Patch Manager
+# AWS Systems Manager Patch Manager - Automated Update Management
 
 Automation through Patch Manager & Maintenance Window services allows us to manage operating system updates and upgrades for Windows and Linux computers implemented in AWS, on-premises environments or other cloud providers. We can quickly review the status of available updates on all agent computers and manage the process for installing required updates for servers.
 
