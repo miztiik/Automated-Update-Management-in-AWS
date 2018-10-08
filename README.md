@@ -16,6 +16,8 @@ Automation through Patch Manager & Maintenance Window services allows us to mana
 ## Configure Patch Baseline
 AWS provides default baselines for all major OS's as recommend by the ISVs, If needed we can customize these patch baselines for inclusion or exclusion of any specific patches. The default configuration is good place to start with in most use cases. The same can be duplicated and used for your clients, and made the default baseline to allow for future customizations.
 
+![Configure Patch Baseline](https://raw.githubusercontent.com/miztiik/Automated-Update-Managed-in-AWS/master/images/ssm-patch-management-00.png)
+
 ### Add instances to a patch group
 To allow fine control over the patching of virtual machines running different OS's(example Windows 2016, Windows 2012, RHEL7.x, Amazon Linux etc) and different business functions like (Webservers running IIS or Apache or nginx etc) each of them need to have a special tag key `Patch Group` _DO NOT CUSTOMIZE TAG; USE AS-IS_
 
@@ -34,6 +36,7 @@ To allow fine control over the patching of virtual machines running different OS
 ### Maintenance Windows
 To minimize the impact on service availability, It is recommend that we configure a Maintenance Window to execute patching during times that won't interrupt business operations. AWS Systems Manager Maintenance Windows let you define a schedule for when to perform potentially disruptive actions on your instances such as patching an operating system, updating drivers, or installing software or patches. Each Maintenance Window has a schedule, a duration, a set of registered targets.
 < 2 images>
+![Configure Maintenance Windows](https://raw.githubusercontent.com/miztiik/Automated-Update-Managed-in-AWS/master/images/ssm-patch-management-01.png)
 
 #### Maintenance Window Run Task
 Choose the maintenance windows that suits your environment needs. You can choose a [cron expression](https://docs.aws.amazon.com/systems-manager/latest/userguide/reference-cron-and-rate-expressions.html?shortFooter=true). _Customize as required_.
@@ -46,31 +49,42 @@ Choose the maintenance windows that suits your environment needs. You can choose
 | Acceptance  | Weekend      | 6AM - 11AM |
 | Production  | Weekend      | 6AM - 11AM |
 
+![Configure Maintenance Schedules](https://raw.githubusercontent.com/miztiik/Automated-Update-Managed-in-AWS/master/images/ssm-patch-management-02.png)
+
 _Important:_ After installing patches, Systems Manager reboots each instance. The reboot is required to make sure that patches are installed correctly and to ensure that the system did not leave the instance in a potentially bad state.
 
-
-`AWS-RunPatchBaseline` - This is the latest version of document [recommended](https://docs.aws.amazon.com/systems-manager/latest/userguide/patch-manager-ssm-documents.html#patch-manager-ssm-documents-recommended-AWS-InstallWindowsUpdates) by Amazon to install/scan patches.
-
-
-#### Add Targets to Maintenance window
-<1 images>
-
-### Attach Targets
+### Add Targets to Maintenance window
 The easiest way to attach targets is to use the tag key `Patch Group` and have multiple values suiting your needs.
 
 Create `Patch Group` for your environment, For example,
 - `Win` - For patching all windows Servers
 - `Linux` - For all servers running Linux OSes
 - `Web Servers` - For pathing all Web Servers
+![Patch Group](https://raw.githubusercontent.com/miztiik/Automated-Update-Managed-in-AWS/master/images/ssm-patch-management-03.png)
+![Register Targets](https://raw.githubusercontent.com/miztiik/Automated-Update-Managed-in-AWS/master/images/ssm-patch-management-04.png)
 
-#### Add the runtask to patch the servers
-<IMAGE>
+### Add `Runtask` to patch the servers
+![Add Tasks](https://raw.githubusercontent.com/miztiik/Automated-Update-Managed-in-AWS/master/images/ssm-patch-management-05.png)
+`AWS-RunPatchBaseline` - This is the latest version of document [recommended](https://docs.aws.amazon.com/systems-manager/latest/userguide/patch-manager-ssm-documents.html#patch-manager-ssm-documents-recommended-AWS-InstallWindowsUpdates) by Amazon to install/scan patches.
+![Add Run Document](https://raw.githubusercontent.com/miztiik/Automated-Update-Managed-in-AWS/master/images/ssm-patch-management-06.png)
+![Add Run Document](https://raw.githubusercontent.com/miztiik/Automated-Update-Managed-in-AWS/master/images/ssm-patch-management-07.png)
 
+**You can control how many instances are patched at any given time and how to handle errors using `Rate Control`**
+![Rate Control](https://raw.githubusercontent.com/miztiik/Automated-Update-Managed-in-AWS/master/images/ssm-patch-management-08.png)
+Update the Role ARN, that was created in the _Pre-Requisites_.
+##### Save Output to S3
+In case you want to analyze the patch update logs, you can save them to S3
+![Save Output to S3](https://raw.githubusercontent.com/miztiik/Automated-Update-Managed-in-AWS/master/images/ssm-patch-management-09.png)
 
-Now that all the steps are completed. The automation will kick in as per the schedule chosen.
+### `Scan` or `Install`
+If you want to only `Scan` your instances for missing patches then use the `Scan` option, If you want the patches to be installed, use the `Install` Option. _The below screenshot shows only _scan_.
+![Scan for missing patches](https://raw.githubusercontent.com/miztiik/Automated-Update-Managed-in-AWS/master/images/ssm-patch-management-10.png)
+
+**Now that all the steps are completed. The automation will kick in as per the schedule chosen.**
 
 ### Monitoring Updates 
 Under managed instances of SSM, we can find all the missing and installed patches. Under compliance section the overall view can be seen.
+![Save Output to S3](https://raw.githubusercontent.com/miztiik/Automated-Update-Managed-in-AWS/master/images/ssm-patch-management-11.png)
 
 
 
